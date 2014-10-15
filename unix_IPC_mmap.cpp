@@ -22,6 +22,7 @@ using namespace std;
 #define RECV_BUF_SIZE_MB 32;  //size of receive buffer for each proc in MB
 
 int proc_set_affinity(int proc_num, pid_t pid);
+void proc_get_affinity(int proc_num, pid_t pid, int NUM_PROCS);
 void check_errno(int err_no);
 
 int main (int argc, char* argv[])
@@ -62,9 +63,12 @@ int main (int argc, char* argv[])
       return 1;
     }
   }
+  int TOT_NUM_PROCS = sysconf(_SC_NPROCESSORS_CONF);
   //fn to set affinity for each process
-  if (proc_set_affinity(proc_num * 10, pid) == -1)  //Setting affinity
+  if (proc_set_affinity((proc_num * 4 + 1) % TOT_NUM_PROCS, pid)  == -1)  //Setting affinity
     return 1;
+  //fn to check affinity set
+  proc_get_affinity(proc_num, pid, NUM_PROCS);
   //"proc_num"s < NUM_PROCS are used as senders
   if (proc_num < NUM_PROCS) {
     double begin_time_init = timerval();  //initialization start time of transfer registered
@@ -172,4 +176,16 @@ int proc_set_affinity(int proc_num, pid_t pid) {
     return -1;
   }
   return 0;
+}
+
+void proc_get_affinity(int proc_num, pid_t pid, int NUM_PROCS)
+{
+  cpu_set_t mycpuid;
+  sched_getaffinity(pid, sizeof(mycpuid), &mycpuid);
+  int TOT_NUM_PROCS = sysconf(_SC_NPROCESSORS_CONF);
+  for (int cpu_num = 1 ; cpu_num <= TOT_NUM_PROCS ; cpu_num++) {
+    if (CPU_ISSET(cpu_num, &mycpuid)) {
+      cout<<"Affinity set for proc "<<proc_num<<" :"<<cpu_num<<endl;
+    }
+  }
 }
