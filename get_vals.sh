@@ -1,5 +1,5 @@
 #! /bin/bash
-if [ "$#" -lt 4 ] 
+if [ "$#" -lt 3 ] 
 then
     echo "Illegal number of parameters"
     echo "Format : sh get_vals.sh <num_procs> <max_msg_size> <iterations> <directory_path(optional)>"

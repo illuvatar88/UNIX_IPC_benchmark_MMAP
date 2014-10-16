@@ -49,6 +49,7 @@ int main (int argc, char* argv[])
   //array holding stop indicators corresponding to each sending/receiving process
   //the stop indicators are set by each process once it has completed sending/receving
   int *stop_array = (int*)mmap(NULL, NUM_PROCS*sizeof(int), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
+  //shared variable to be set when all the sending processes have completed sending
   int volatile *stop = (int*)mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
   //variable proc_num holds the process number of the forked process
   int proc_num = 0;
